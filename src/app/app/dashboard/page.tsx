@@ -8,10 +8,7 @@ import OpsAdvisor from '@/components/dashboard/OpsAdvisor'
 import MomentumBar from '@/components/dashboard/MomentumBar'
 
 const SEVERITY_ORDER: Record<BlockerSeverity, number> = {
-  critical: 4,
-  high: 3,
-  medium: 2,
-  low: 1,
+  critical: 4, high: 3, medium: 2, low: 1,
 }
 
 export default async function DashboardPage() {
@@ -25,7 +22,11 @@ export default async function DashboardPage() {
     { data: latestRec },
   ] = await Promise.all([
     supabase.from('ventures').select('*').order('name'),
-    supabase.from('blockers').select('*, ventures(name, color)').eq('status', 'open').order('severity'),
+    supabase
+      .from('blockers')
+      .select('*, ventures(name, color)')
+      .neq('status', 'resolved')
+      .order('severity'),
     supabase
       .from('milestones')
       .select('*, ventures(name, color)')
@@ -44,13 +45,15 @@ export default async function DashboardPage() {
   ])
 
   const ventureList = (ventures ?? []) as Venture[]
-  const blockerList = (openBlockers ?? []) as Blocker[]
+  // Sort blockers: critical first
+  const blockerList = ((openBlockers ?? []) as Blocker[]).sort(
+    (a, b) => SEVERITY_ORDER[b.severity] - SEVERITY_ORDER[a.severity]
+  )
   const milestoneList = (allMilestones ?? []) as Milestone[]
   const activityList = (activity ?? []) as ActivityLog[]
 
   // --- Per-venture milestone stats ---
   const milestoneStatsByVenture: Record<string, { total: number; done: number }> = {}
-  // Open (non-done, non-cancelled) milestone count per venture — used for blocker impact
   const openMilestoneCountByVenture: Record<string, number> = {}
 
   for (const m of milestoneList) {
@@ -58,7 +61,6 @@ export default async function DashboardPage() {
     if (!milestoneStatsByVenture[m.venture_id]) {
       milestoneStatsByVenture[m.venture_id] = { total: 0, done: 0 }
     }
-    // Count cancelled milestones as neither done nor total (they're abandoned)
     if (m.status !== 'cancelled') {
       milestoneStatsByVenture[m.venture_id].total++
       if (m.status === 'done') milestoneStatsByVenture[m.venture_id].done++
@@ -81,49 +83,63 @@ export default async function DashboardPage() {
     }
   }
 
-  // --- Next milestone per venture (for due date display) ---
+  // --- Next milestone per venture ---
   const nextMilestoneByVenture: Record<string, Milestone> = {}
   for (const m of milestoneList) {
     if (m.venture_id && m.status !== 'done' && m.status !== 'cancelled') {
-      if (!nextMilestoneByVenture[m.venture_id]) {
-        nextMilestoneByVenture[m.venture_id] = m
-      }
+      if (!nextMilestoneByVenture[m.venture_id]) nextMilestoneByVenture[m.venture_id] = m
     }
   }
 
-  // --- Upcoming milestones list (not done, not cancelled, capped at 8) ---
-  const upcomingMilestones = milestoneList
-    .filter(m => m.status !== 'done' && m.status !== 'cancelled')
-    .slice(0, 8)
+  // --- Active milestones for the list (in_progress first, then pending, cap 10) ---
+  const activeMilestones = [
+    ...milestoneList.filter(m => m.status === 'in_progress'),
+    ...milestoneList.filter(m => m.status === 'pending'),
+  ].slice(0, 10)
 
   // --- Momentum stats ---
-  const activeMilestones = milestoneList.filter(m => m.status !== 'cancelled')
-  const totalMilestones = activeMilestones.length
-  const doneMilestones = activeMilestones.filter(m => m.status === 'done').length
+  const nonCancelled = milestoneList.filter(m => m.status !== 'cancelled')
+  const totalMilestones = nonCancelled.length
+  const doneMilestones = nonCancelled.filter(m => m.status === 'done').length
   const overallPct = totalMilestones > 0 ? (doneMilestones / totalMilestones) * 100 : 0
   const remainingMilestones = totalMilestones - doneMilestones
 
   return (
     <div className="px-6 py-8 max-w-6xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-xl font-semibold text-white">Dashboard</h1>
-        <p className="text-sm text-neutral-500 mt-1">
-          {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-        </p>
-      </div>
-
-      {/* Momentum bar */}
-      <section className="mb-8">
+      {/* Header */}
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold text-white">Dashboard</h1>
+          <p className="text-sm text-slate-500 mt-0.5">
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+          </p>
+        </div>
         <MomentumBar
           overallPct={overallPct}
           remainingMilestones={remainingMilestones}
           activeBlockers={blockerList.length}
+          compact
         />
+      </div>
+
+      {/* Ops Advisor */}
+      <section className="mb-6">
+        <OpsAdvisor latest={latestRec ?? null} />
+      </section>
+
+      {/* Blockers + Milestones */}
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        <BlockersList
+          blockers={blockerList}
+          openMilestoneCountByVenture={openMilestoneCountByVenture}
+          ventures={ventureList.map(v => ({ id: v.id, name: v.name }))}
+        />
+        <MilestonesList milestones={activeMilestones} />
       </section>
 
       {/* Venture grid */}
-      <section className="mb-8">
-        <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-3">Ventures</h2>
+      <section className="mb-6">
+        <h2 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-3">Ventures</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {ventureList.map(venture => (
             <VentureCard
@@ -136,20 +152,6 @@ export default async function DashboardPage() {
             />
           ))}
         </div>
-      </section>
-
-      {/* Blockers + Milestones */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-        <BlockersList
-          blockers={blockerList}
-          openMilestoneCountByVenture={openMilestoneCountByVenture}
-        />
-        <MilestonesList milestones={upcomingMilestones} />
-      </section>
-
-      {/* Ops Advisor */}
-      <section className="mb-4">
-        <OpsAdvisor latest={latestRec ?? null} />
       </section>
 
       {/* Activity feed */}

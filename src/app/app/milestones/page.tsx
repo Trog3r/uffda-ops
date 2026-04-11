@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import type { Milestone } from '@/lib/types'
-import Badge, { statusVariant } from '@/components/ui/Badge'
+import MilestoneRow from '@/components/dashboard/MilestoneRow'
 import EmptyState from '@/components/ui/EmptyState'
 
 export default async function MilestonesPage() {
@@ -9,57 +9,47 @@ export default async function MilestonesPage() {
   const { data } = await supabase
     .from('milestones')
     .select('*, ventures(name, color)')
+    .order('status')
     .order('due_date', { ascending: true, nullsFirst: false })
 
   const milestones = (data ?? []) as Milestone[]
 
-  function formatDate(d: string | null) {
-    if (!d) return '—'
-    return new Date(d + 'T00:00:00').toLocaleDateString('en-US', {
-      month: 'short', day: 'numeric', year: 'numeric',
-    })
-  }
+  const groups = [
+    { label: 'In Progress', items: milestones.filter(m => m.status === 'in_progress') },
+    { label: 'Not Started',  items: milestones.filter(m => m.status === 'pending') },
+    { label: 'Done',         items: milestones.filter(m => m.status === 'done') },
+    { label: 'Cancelled',    items: milestones.filter(m => m.status === 'cancelled') },
+  ].filter(g => g.items.length > 0)
 
   return (
     <div className="px-6 py-8 max-w-4xl mx-auto">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6">
         <h1 className="text-xl font-semibold text-white">Milestones</h1>
+        <p className="text-sm text-slate-500 mt-0.5">Click any row to update status, progress, or notes</p>
       </div>
 
-      <div className="bg-[#1a1a1a] border border-neutral-800 rounded-lg overflow-hidden">
-        {milestones.length === 0 ? (
+      {milestones.length === 0 ? (
+        <div className="bg-[#1a1a1a] border border-neutral-800 rounded-lg">
           <EmptyState message="No milestones yet" />
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-neutral-800 text-xs text-neutral-500 uppercase tracking-wider">
-                <th className="text-left px-4 py-3 font-medium">Title</th>
-                <th className="text-left px-4 py-3 font-medium">Venture</th>
-                <th className="text-left px-4 py-3 font-medium">Due</th>
-                <th className="text-left px-4 py-3 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-800">
-              {milestones.map(m => (
-                <tr key={m.id} className="hover:bg-neutral-800/30 transition-colors">
-                  <td className="px-4 py-3 text-neutral-200">{m.title}</td>
-                  <td className="px-4 py-3">
-                    {m.ventures ? (
-                      <span className="text-neutral-400">{m.ventures.name}</span>
-                    ) : (
-                      <span className="text-neutral-700">—</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-neutral-400">{formatDate(m.due_date)}</td>
-                  <td className="px-4 py-3">
-                    <Badge label={m.status.replace('_', ' ')} variant={statusVariant(m.status)} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {groups.map(group => (
+            <div key={group.label}>
+              <h2 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">
+                {group.label} <span className="text-slate-700">({group.items.length})</span>
+              </h2>
+              <div className="bg-[#1a1a1a] border border-neutral-800 rounded-lg overflow-hidden">
+                <ul>
+                  {group.items.map(m => (
+                    <MilestoneRow key={m.id} milestone={m} />
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

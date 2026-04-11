@@ -23,6 +23,8 @@ export interface Milestone {
   description: string | null
   due_date: string | null
   status: MilestoneStatus
+  progress: number
+  notes: string | null
   created_at: string
   updated_at: string
   ventures?: { name: string; color: string | null }
@@ -31,10 +33,12 @@ export interface Milestone {
 export interface Blocker {
   id: string
   venture_id: string | null
+  milestone_id: string | null
   title: string
   description: string | null
   severity: BlockerSeverity
   status: BlockerStatus
+  next_action: string | null
   resolved_at: string | null
   created_at: string
   updated_at: string
