@@ -37,7 +37,7 @@ Both values are in your Supabase project under **Project Settings → API**.
 
 ### 3. Local dev
 
-Requires Node 20+. If using nvm: `nvm use 24`
+Requires Node 24. If using nvm: `nvm use 24`
 
 ```bash
 npm install
@@ -50,8 +50,9 @@ Open [http://localhost:3000](http://localhost:3000)
 
 1. Push this repo to GitHub
 2. Import into [Vercel](https://vercel.com)
-3. Add the two env vars in **Project Settings → Environment Variables**
-4. Deploy — Vercel handles the rest
+3. Set **Node.js Version** to **24.x** in **Settings → General**
+4. Add the two env vars in **Project Settings → Environment Variables**
+5. Deploy — Vercel handles the rest
 
 ---
 
