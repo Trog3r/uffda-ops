@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Uffda Ops
 
-## Getting Started
+Private internal operations dashboard for the Uffda portfolio of ventures.
 
-First, run the development server:
+**Stack:** Next.js 16 (App Router) · Supabase (auth + DB) · Tailwind v4 · Vercel
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## Setup
+
+### 1. Supabase project
+
+1. Create a new project at [supabase.com](https://supabase.com)
+2. Go to **SQL Editor** and run the migration:
+   ```
+   supabase/migrations/0001_initial_schema.sql
+   ```
+   This creates all tables, RLS policies, and seeds the 5 ventures.
+
+3. In **Authentication → URL Configuration**:
+   - Set **Site URL** to your Vercel deployment URL (e.g. `https://ops.uffdasoftware.com`)
+   - Add `https://ops.uffdasoftware.com/auth/callback` to **Redirect URLs**
+   - For local dev, also add `http://localhost:3000/auth/callback`
+
+4. In **Authentication → Users**, create your account manually (or use the Supabase dashboard to invite yourself).
+
+### 2. Environment variables
+
+Copy `.env.example` to `.env.local` and fill in your values:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Both values are in your Supabase project under **Project Settings → API**.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Local dev
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Requires Node 20+. If using nvm: `nvm use 24`
 
-## Learn More
+```bash
+npm install
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open [http://localhost:3000](http://localhost:3000)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. Deploy to Vercel
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Push this repo to GitHub
+2. Import into [Vercel](https://vercel.com)
+3. Add the two env vars in **Project Settings → Environment Variables**
+4. Deploy — Vercel handles the rest
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Routes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Path | Description |
+|------|-------------|
+| `/` | Login page (public) |
+| `/app/dashboard` | Venture cards, blockers, milestones, activity |
+| `/app/milestones` | All milestones |
+| `/app/blockers` | All blockers |
+| `/app/backlog` | Backlog items |
+| `/app/settings` | Account info |
+
+All `/app/*` routes require authentication. Unauthenticated visitors are redirected to `/`.
