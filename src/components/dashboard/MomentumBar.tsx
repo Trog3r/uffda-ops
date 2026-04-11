@@ -8,8 +8,8 @@ interface MomentumBarProps {
 
 export default function MomentumBar({ overallPct, remainingMilestones, activeBlockers }: MomentumBarProps) {
   const pct = Math.round(overallPct)
-  const barColor = pct >= 75 ? 'green' : pct >= 35 ? 'yellow' : 'red'
-  const pctColor = barColor === 'green' ? 'text-emerald-400' : barColor === 'yellow' ? 'text-amber-400' : 'text-red-400'
+  const barColor = pct >= 75 ? 'teal' : pct >= 35 ? 'yellow' : 'red'
+  const pctColor = barColor === 'teal' ? 'text-cyan-400' : barColor === 'yellow' ? 'text-amber-400' : 'text-red-400'
 
   return (
     <div className="rounded-lg border border-neutral-700 bg-[#111] p-5">

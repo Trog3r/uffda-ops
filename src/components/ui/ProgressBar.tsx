@@ -1,17 +1,18 @@
 interface ProgressBarProps {
   value: number // 0–100
-  color?: 'green' | 'yellow' | 'red' | 'blue' | 'neutral'
+  color?: 'teal' | 'green' | 'yellow' | 'red' | 'blue' | 'neutral'
   height?: 'xs' | 'sm'
   showLabel?: boolean
   animate?: boolean
 }
 
 const colorClass = {
+  teal:    'bg-cyan-400',
   green:   'bg-emerald-500',
   yellow:  'bg-amber-500',
   red:     'bg-red-500',
   blue:    'bg-sky-500',
-  neutral: 'bg-neutral-500',
+  neutral: 'bg-slate-600',
 }
 
 export default function ProgressBar({

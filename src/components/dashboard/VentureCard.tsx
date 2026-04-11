@@ -51,8 +51,8 @@ const healthBorder: Record<Health, string> = {
   neutral: 'border-neutral-800',
 }
 
-const progressColor: Record<Health, 'green' | 'yellow' | 'red' | 'neutral'> = {
-  green:   'green',
+const progressColor: Record<Health, 'teal' | 'yellow' | 'red' | 'neutral'> = {
+  green:   'teal',
   yellow:  'yellow',
   red:     'red',
   neutral: 'neutral',

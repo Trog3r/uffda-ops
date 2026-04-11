@@ -53,7 +53,7 @@ export default function OpsAdvisor({ latest }: OpsAdvisorProps) {
         <button
           onClick={refresh}
           disabled={isPending}
-          className="text-xs px-3 py-1.5 rounded-md bg-neutral-800 text-neutral-300 hover:bg-neutral-700 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="text-xs px-3 py-1.5 rounded-md bg-orange-500/10 text-orange-400 border border-orange-500/20 hover:bg-orange-500/20 hover:text-orange-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isPending ? 'Thinking…' : 'Refresh'}
         </button>

@@ -20,10 +20,10 @@ function formatDue(dateStr: string | null) {
   return { label, overdue }
 }
 
-function milestoneProgress(status: string): { pct: number; color: 'green' | 'blue' | 'neutral' } {
+function milestoneProgress(status: string): { pct: number; color: 'teal' | 'green' | 'neutral' } {
   switch (status) {
     case 'done':        return { pct: 100, color: 'green' }
-    case 'in_progress': return { pct: 50,  color: 'blue' }
+    case 'in_progress': return { pct: 50,  color: 'teal' }
     default:            return { pct: 0,   color: 'neutral' }
   }
 }

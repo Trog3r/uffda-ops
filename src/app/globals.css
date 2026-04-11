@@ -1,11 +1,23 @@
 @import "tailwindcss";
 
+@theme {
+  /* Brand: orange = priority/actions, cyan = progress/structure */
+  --color-action:   #F97316;
+  --color-progress: #22D3EE;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
-  background: #0f0f0f;
+  background: #020617;
   color: #e5e5e5;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #334155; }
