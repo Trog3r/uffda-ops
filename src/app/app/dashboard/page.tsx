@@ -4,6 +4,7 @@ import VentureCard from '@/components/dashboard/VentureCard'
 import BlockersList from '@/components/dashboard/BlockersList'
 import MilestonesList from '@/components/dashboard/MilestonesList'
 import ActivityFeed from '@/components/dashboard/ActivityFeed'
+import OpsAdvisor from '@/components/dashboard/OpsAdvisor'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -13,6 +14,7 @@ export default async function DashboardPage() {
     { data: openBlockers },
     { data: upcomingMilestones },
     { data: activity },
+    { data: latestRec },
   ] = await Promise.all([
     supabase.from('ventures').select('*').order('name'),
     supabase.from('blockers').select('*, ventures(name, color)').eq('status', 'open').order('severity'),
@@ -26,6 +28,11 @@ export default async function DashboardPage() {
       .select('*, ventures(name, color)')
       .order('created_at', { ascending: false })
       .limit(15),
+    supabase.from('ai_recommendations')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ])
 
   const ventureList = (ventures ?? []) as Venture[]
@@ -76,6 +83,11 @@ export default async function DashboardPage() {
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
         <BlockersList blockers={blockerList} />
         <MilestonesList milestones={milestoneList} />
+      </section>
+
+      {/* Ops Advisor */}
+      <section className="mb-4">
+        <OpsAdvisor latest={latestRec ?? null} />
       </section>
 
       {/* Activity feed */}
