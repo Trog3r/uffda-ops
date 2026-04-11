@@ -85,7 +85,7 @@ Keep each field to 1-3 sentences max. Be a trusted advisor, not a consultant. Be
 
   const message = await anthropic.messages.create({
     model: 'claude-opus-4-6',
-    max_tokens: 1024,
+    max_tokens: 4096,
     thinking: { type: 'adaptive' },
     messages: [{ role: 'user', content: prompt }],
   })
@@ -104,11 +104,17 @@ Keep each field to 1-3 sentences max. Be a trusted advisor, not a consultant. Be
   }
 
   try {
-    const jsonMatch = textBlock.text.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) throw new Error('No JSON found')
+    // Strip markdown code fences if present, then extract the JSON object
+    const stripped = textBlock.text.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim()
+    const jsonMatch = stripped.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) throw new Error(`No JSON found in response: ${stripped.slice(0, 200)}`)
     parsed = JSON.parse(jsonMatch[0])
-  } catch {
-    return NextResponse.json({ error: 'Failed to parse AI response' }, { status: 500 })
+  } catch (e) {
+    console.error('[ai-advisor] parse error:', e)
+    return NextResponse.json(
+      { error: `Failed to parse AI response: ${e instanceof Error ? e.message : String(e)}` },
+      { status: 500 }
+    )
   }
 
   const { data: saved, error: saveError } = await supabase
