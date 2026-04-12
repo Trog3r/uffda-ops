@@ -2,7 +2,20 @@
 
 Private internal operations dashboard for the Uffda portfolio of ventures.
 
-**Stack:** Next.js 16 (App Router) · Supabase (auth + DB) · Tailwind v4 · Vercel
+**Stack:** Next.js 16 (App Router) · Supabase (auth + DB) · Tailwind v4 · Vercel · Anthropic Claude
+
+---
+
+## Features
+
+- **Dashboard** — momentum stats (% to revenue, milestones remaining, active blockers), venture cards with health colors and progress bars, open blockers, active milestones, activity feed
+- **Ops Advisor** — AI brief powered by `claude-opus-4-6`: top priorities, biggest blocker, fastest path to revenue, what can wait, suggested next action. Pulls live venture/milestone/blocker/activity data. Saved to Supabase on each refresh.
+- **Milestone tracking** — inline expand to update status, progress (+10% / mark complete), and notes (autosave on blur)
+- **Blocker management** — New Blocker form with severity pills, venture picker, next action field; inline Working / Resolve quick actions
+- **Milestones page** — grouped by status (In Progress / Not Started / Done / Cancelled), all interactive
+- **Blockers page** — open sorted by severity, resolved shown dimmed below
+- **Backlog** — priority-ranked items per venture
+- **Brand identity** — `#020617` dark navy background, orange (`#F97316`) for actions/CTAs, teal (`#22D3EE`) for progress/structure; favicon and web app manifest wired up
 
 ---
 
@@ -31,9 +44,14 @@ Copy `.env.example` to `.env.local` and fill in your values:
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-Both values are in your Supabase project under **Project Settings → API**.
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anon key |
+| `ANTHROPIC_API_KEY` | Yes | AI Advisor (server-side only, never exposed to browser) |
 
 ### 3. Local dev
 
@@ -51,7 +69,7 @@ Open [http://localhost:3000](http://localhost:3000)
 1. Push this repo to GitHub
 2. Import into [Vercel](https://vercel.com)
 3. Set **Node.js Version** to **24.x** in **Settings → General**
-4. Add the two env vars in **Project Settings → Environment Variables**
+4. Add all three env vars in **Project Settings → Environment Variables**
 5. Deploy — Vercel handles the rest
 
 ---
@@ -61,10 +79,25 @@ Open [http://localhost:3000](http://localhost:3000)
 | Path | Description |
 |------|-------------|
 | `/` | Login page (public) |
-| `/app/dashboard` | Venture cards, blockers, milestones, activity |
-| `/app/milestones` | All milestones |
-| `/app/blockers` | All blockers |
+| `/auth/forgot-password` | Request password reset email |
+| `/auth/reset-password` | Set new password (after reset link) |
+| `/app/dashboard` | Main dashboard — momentum, advisor, blockers, milestones, ventures |
+| `/app/milestones` | All milestones grouped by status |
+| `/app/blockers` | All blockers with new blocker form |
 | `/app/backlog` | Backlog items |
 | `/app/settings` | Account info |
 
 All `/app/*` routes require authentication. Unauthenticated visitors are redirected to `/`.
+
+---
+
+## Database Schema
+
+| Table | Purpose |
+|-------|---------|
+| `ventures` | 5 ventures — Uffda Motors, Uffda Software, Fleet, SMS Demo, Uffda Foundation |
+| `milestones` | Milestones per venture; fields: title, status, progress (0–100), notes, due_date |
+| `blockers` | Open issues per venture; fields: title, severity, status, next_action, milestone_id |
+| `backlog_items` | Prioritized backlog per venture |
+| `activity_log` | Audit log of notable events |
+| `ai_recommendations` | Saved AI Advisor outputs with timestamp |
