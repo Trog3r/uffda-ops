@@ -1,5 +1,12 @@
 import type { Metadata } from 'next'
+import { Manrope } from 'next/font/google'
 import './globals.css'
+
+const manrope = Manrope({
+  subsets: ['latin'],
+  variable: '--font-manrope',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'Uffda Ops',
@@ -16,7 +23,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className={`h-full ${manrope.variable}`}>
       <body className="h-full">{children}</body>
     </html>
   )

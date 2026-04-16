@@ -109,8 +109,8 @@ export default async function DashboardPage() {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-white">Dashboard</h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <h1 className="text-lg font-semibold text-white tracking-tight">Dashboard</h1>
+          <p className="text-xs text-slate-600 mt-0.5 uppercase tracking-wider">
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </p>
         </div>
@@ -139,7 +139,7 @@ export default async function DashboardPage() {
 
       {/* Venture grid */}
       <section className="mb-6">
-        <h2 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-3">Ventures</h2>
+        <h2 className="ops-label mb-3">Ventures</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {ventureList.map(venture => (
             <VentureCard

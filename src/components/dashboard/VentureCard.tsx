@@ -37,18 +37,11 @@ function getHealth(openBlockerCount: number, maxSeverity: string | null): Health
   return 'yellow'
 }
 
-const healthBar: Record<Health, string> = {
-  green:   'bg-emerald-500',
-  yellow:  'bg-amber-500',
-  red:     'bg-red-500',
-  neutral: 'bg-neutral-700',
-}
-
 const healthBorder: Record<Health, string> = {
-  green:   'border-emerald-600/40',
-  yellow:  'border-amber-600/40',
-  red:     'border-red-600/40',
-  neutral: 'border-neutral-800',
+  green:   'border-white/[0.08]',
+  yellow:  'border-amber-600/20',
+  red:     'border-red-600/20',
+  neutral: 'border-white/[0.06]',
 }
 
 const progressColor: Record<Health, 'teal' | 'yellow' | 'red' | 'neutral'> = {
@@ -74,44 +67,40 @@ export default function VentureCard({
 
   return (
     <div
-      className={`bg-[#1a1a1a] border rounded-lg p-4 flex flex-col gap-3 hover:border-neutral-700 transition-colors ${healthBorder[health]}`}
-      style={{ borderLeftColor: accentColor, borderLeftWidth: 3 }}
+      className={`bg-[#080f1d] border rounded-lg p-4 flex flex-col gap-3 hover:bg-[#0d1626] transition-colors ${healthBorder[health]}`}
+      style={{ borderTopColor: accentColor, borderTopWidth: 2 }}
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
-          {/* Health dot */}
-          <span className={`shrink-0 w-1.5 h-1.5 rounded-full ${healthBar[health]}`} />
-          <h3 className="text-sm font-semibold text-white leading-tight truncate">{venture.name}</h3>
-        </div>
+        <h3 className="text-sm font-semibold text-white leading-tight truncate">{venture.name}</h3>
         <Badge label={venture.status} variant={statusVariant(venture.status)} />
       </div>
 
       {venture.description && (
-        <p className="text-xs text-neutral-500 leading-relaxed">{venture.description}</p>
+        <p className="text-xs text-slate-500 leading-relaxed">{venture.description}</p>
       )}
 
       {/* Progress */}
       {milestoneStats.total > 0 ? (
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           <ProgressBar
             value={pct}
             color={progressColor[health]}
             height="sm"
             showLabel
           />
-          <p className="text-xs text-neutral-600">
-            {milestoneStats.done} of {milestoneStats.total} milestones done
+          <p className="text-xs text-slate-600">
+            {milestoneStats.done} / {milestoneStats.total} milestones
           </p>
         </div>
       ) : (
-        <p className="text-xs text-neutral-700">No milestones</p>
+        <p className="text-xs text-slate-700">No milestones</p>
       )}
 
       {/* Footer */}
-      <div className="flex items-center gap-4 text-xs text-neutral-500 mt-auto pt-2 border-t border-neutral-800">
+      <div className="flex items-center gap-4 text-xs mt-auto pt-2.5 border-t border-white/[0.05]">
         {openBlockerCount > 0 ? (
-          <span className={openBlockerCount > 0 && (maxBlockerSeverity === 'critical' || maxBlockerSeverity === 'high') ? 'text-red-400 font-medium' : 'text-amber-400 font-medium'}>
+          <span className={(maxBlockerSeverity === 'critical' || maxBlockerSeverity === 'high') ? 'text-red-400 font-medium' : 'text-amber-400 font-medium'}>
             {openBlockerCount} blocker{openBlockerCount !== 1 ? 's' : ''}
           </span>
         ) : (
@@ -119,7 +108,7 @@ export default function VentureCard({
         )}
 
         {nextMilestone && (
-          <span className={dueInfo?.overdue ? 'text-red-400' : 'text-neutral-400'}>
+          <span className={dueInfo?.overdue ? 'text-red-400' : 'text-slate-500'}>
             {dueInfo ? `Due ${dueInfo.label}` : nextMilestone.title.slice(0, 24)}
           </span>
         )}

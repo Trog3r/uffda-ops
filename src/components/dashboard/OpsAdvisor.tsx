@@ -42,20 +42,23 @@ export default function OpsAdvisor({ latest }: OpsAdvisorProps) {
     : null
 
   return (
-    <div className="rounded-lg border border-neutral-800 bg-[#111] p-5">
+    <div className="rounded-lg border border-orange-500/20 bg-[#0d0a06] p-5" style={{ boxShadow: '0 0 0 1px rgba(249,115,22,0.06), inset 0 1px 0 rgba(249,115,22,0.06)' }}>
       <div className="flex items-center justify-between mb-4">
-        <div>
-          <h2 className="text-sm font-semibold text-white">Ops Advisor</h2>
-          {timestamp && (
-            <p className="text-xs text-neutral-600 mt-0.5">Last updated {timestamp}</p>
-          )}
+        <div className="flex items-center gap-2.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse shrink-0" />
+          <div>
+            <h2 className="text-sm font-semibold text-white">Ops Advisor</h2>
+            {timestamp && (
+              <p className="text-[10px] text-slate-600 mt-0.5 uppercase tracking-wide">Briefing — {timestamp}</p>
+            )}
+          </div>
         </div>
         <button
           onClick={refresh}
           disabled={isPending}
-          className="text-xs px-3 py-1.5 rounded-md bg-orange-500/10 text-orange-400 border border-orange-500/20 hover:bg-orange-500/20 hover:text-orange-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="text-xs px-3 py-1.5 rounded-md bg-orange-500/10 text-orange-400 border border-orange-500/20 hover:bg-orange-500/20 hover:text-orange-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed font-medium"
         >
-          {isPending ? 'Thinking…' : 'Refresh'}
+          {isPending ? 'Thinking…' : 'Refresh brief'}
         </button>
       </div>
 
@@ -64,26 +67,26 @@ export default function OpsAdvisor({ latest }: OpsAdvisorProps) {
       )}
 
       {!rec && !isPending && (
-        <p className="text-sm text-neutral-500">No recommendations yet. Hit Refresh to get your first brief.</p>
+        <p className="text-sm text-slate-500">No briefing yet. Hit <span className="text-orange-400">Refresh brief</span> to generate your first advisory.</p>
       )}
 
       {isPending && (
-        <div className="space-y-2">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-3 bg-neutral-800 rounded animate-pulse" style={{ width: `${70 + (i % 3) * 10}%` }} />
+        <div className="space-y-2.5">
+          {[80, 70, 90, 60, 75].map((w, i) => (
+            <div key={i} className="h-2.5 bg-slate-800 rounded-full animate-pulse" style={{ width: `${w}%` }} />
           ))}
         </div>
       )}
 
       {rec && !isPending && (
-        <div className="space-y-4">
-          <Section label="Top Priorities" value={rec.top_priorities} />
-          <Section label="Biggest Blocker" value={rec.biggest_blocker} accent="red" />
-          <Section label="Fastest Path to Revenue" value={rec.fastest_path_to_revenue} accent="green" />
-          <Section label="What Can Wait" value={rec.what_can_wait} />
-          <div className="mt-4 pt-4 border-t border-neutral-800">
-            <p className="text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1.5">Next Action</p>
-            <p className="text-sm text-white font-medium">{rec.suggested_next_action}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <BriefingCard label="Top Priorities" value={rec.top_priorities} />
+          <BriefingCard label="Biggest Blocker" value={rec.biggest_blocker} accent="red" />
+          <BriefingCard label="Fastest Path to Revenue" value={rec.fastest_path_to_revenue} accent="green" />
+          <BriefingCard label="What Can Wait" value={rec.what_can_wait} />
+          <div className="sm:col-span-2 lg:col-span-2 rounded-md bg-orange-500/[0.07] border border-orange-500/15 p-3">
+            <p className="ops-label text-orange-400/70 mb-1.5">Suggested Next Action</p>
+            <p className="text-sm text-white font-medium leading-snug">{rec.suggested_next_action}</p>
           </div>
         </div>
       )}
@@ -91,12 +94,12 @@ export default function OpsAdvisor({ latest }: OpsAdvisorProps) {
   )
 }
 
-function Section({ label, value, accent }: { label: string; value: string; accent?: 'red' | 'green' }) {
-  const textColor = accent === 'red' ? 'text-red-400' : accent === 'green' ? 'text-emerald-400' : 'text-neutral-300'
+function BriefingCard({ label, value, accent }: { label: string; value: string; accent?: 'red' | 'green' }) {
+  const textColor = accent === 'red' ? 'text-red-400' : accent === 'green' ? 'text-emerald-400' : 'text-slate-300'
   return (
     <div>
-      <p className="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-1">{label}</p>
-      <p className={`text-sm whitespace-pre-line ${textColor}`}>{value}</p>
+      <p className="ops-label mb-1.5">{label}</p>
+      <p className={`text-sm whitespace-pre-line leading-relaxed ${textColor}`}>{value}</p>
     </div>
   )
 }
