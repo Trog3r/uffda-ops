@@ -15,7 +15,7 @@ Private internal operations dashboard for the Uffda portfolio of ventures.
 - **Milestones page** — grouped by status (In Progress / Not Started / Done / Cancelled), all interactive
 - **Blockers page** — open sorted by severity, resolved shown dimmed below
 - **Backlog** — priority-ranked items per venture
-- **Brand identity** — `#020617` dark navy background, orange (`#F97316`) for actions/CTAs, teal (`#22D3EE`) for progress/structure; favicon and web app manifest wired up
+- **Brand identity** — `#020617` dark navy background, orange (`#F97316`) for actions/CTAs, teal (`#22D3EE`) for progress/structure; Manrope variable font; noise grain texture; favicon and web app manifest wired up
 
 ---
 
