@@ -22,7 +22,7 @@ export async function POST() {
     { data: activity },
   ] = await Promise.all([
     supabase.from('ventures').select('*').order('name'),
-    supabase.from('blockers').select('*, ventures(name)').eq('status', 'open').order('severity'),
+    supabase.from('blockers').select('*, ventures(name)').neq('status', 'resolved').order('severity'),
     supabase
       .from('milestones')
       .select('*, ventures(name)')
@@ -54,7 +54,7 @@ ${(ventures ?? []).filter(v => v.status === 'active').map(v => `- ${v.name}${v.d
 ${(ventures ?? []).filter(v => v.status !== 'active').map(v => `- ${v.name} (${v.status})`).join('\n') || 'None recorded'}
 
 ### Open Blockers
-${(openBlockers ?? []).map(b => `- [${b.severity}] ${(b as { ventures?: { name: string } }).ventures?.name ?? 'general'}: ${b.title}${b.description ? ` — ${b.description}` : ''}`).join('\n') || 'None recorded — do not assume there are no blockers, data may not be logged yet'}
+${(openBlockers ?? []).map(b => `- [${b.severity}${b.status === 'in_progress' ? ', in progress' : ''}] ${(b as { ventures?: { name: string } }).ventures?.name ?? 'general'}: ${b.title}${b.description ? ` — ${b.description}` : ''}`).join('\n') || 'None recorded — do not assume there are no blockers, data may not be logged yet'}
 
 ### Upcoming Milestones
 ${(milestones ?? []).map(m => `- ${(m as { ventures?: { name: string } }).ventures?.name ?? 'general'}: ${m.title}${m.due_date ? ` (due ${m.due_date})` : ' (no due date)'} [${m.status}]`).join('\n') || 'None recorded — do not assume no milestones exist'}
