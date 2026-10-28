@@ -57,6 +57,8 @@ No admin/service role client. RLS policy is "authenticated full access" — any 
 - **Response shape:** `{ top_priorities, biggest_blocker, fastest_path_to_revenue, what_can_wait, suggested_next_action }`
 - **API key:** `ANTHROPIC_API_KEY` — server-only, never exposed to client
 - Adaptive thinking means Claude may spend significant tokens on reasoning before responding; this is intentional
+- **Snapshot inputs:** every unresolved blocker (`open` and `in_progress`, the latter labeled), up to 10 milestones that aren't `done`/`cancelled`, and the last 20 `activity_log` rows. The advisor only knows what's logged, so log notable changes (e.g. a resolved blocker) to `activity_log` or briefs keep repeating old news.
+- **`lib/founder-context.ts` is hand-maintained business context** sent with every brief. Update it when facts change. It sat at April 2026 ("signing a lease next week") until 2026-10-26, and the advisor kept telling the founder to sign a lease months after the shop opened.
 
 ### Database Tables
 

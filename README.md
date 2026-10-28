@@ -9,7 +9,7 @@ Private internal operations dashboard for the Uffda portfolio of ventures.
 ## Features
 
 - **Dashboard** — momentum stats (% to revenue, milestones remaining, active blockers), venture cards with health colors and progress bars, open blockers, active milestones, activity feed
-- **Ops Advisor** — AI brief powered by `claude-opus-4-6`: top priorities, biggest blocker, fastest path to revenue, what can wait, suggested next action. Pulls live venture/milestone/blocker/activity data. Saved to Supabase on each refresh.
+- **Ops Advisor** — AI brief powered by `claude-opus-4-6`: top priorities, biggest blocker, fastest path to revenue, what can wait, suggested next action. Pulls live venture/milestone/blocker (open and in-progress)/activity data plus the hand-maintained business context in `src/lib/founder-context.ts`. Saved to Supabase on each refresh.
 - **Milestone tracking** — inline expand to update status, progress (+10% / mark complete), and notes (autosave on blur)
 - **Blocker management** — New Blocker form with severity pills, venture picker, next action field; inline Working / Resolve quick actions
 - **Milestones page** — grouped by status (In Progress / Not Started / Done / Cancelled), all interactive
